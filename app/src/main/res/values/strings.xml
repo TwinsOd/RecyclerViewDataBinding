@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">List of pictures</string>
+    <string name="title_activity_show">ShowActivity</string>
+    <string name="transition_image" translatable="false">transition_image</string>
+</resources>
