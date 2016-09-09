@@ -21,7 +21,17 @@
         <activity
             android:name=".ShowActivity"
             android:label="@string/title_activity_show"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".service.TimeService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".receiver.TimeBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>
