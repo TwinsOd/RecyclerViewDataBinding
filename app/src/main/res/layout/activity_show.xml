@@ -32,6 +32,7 @@
             android:layout_centerHorizontal="true"
             app:imageUrl="@{imageModel.url}"
             android:transitionName="@string/transition_image"
+            android:layout_marginTop="@dimen/large_image_margin"
             android:maxHeight="400dp" />
 
         <ScrollView

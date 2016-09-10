@@ -7,4 +7,5 @@
     <dimen name="margin_image">3dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">10dp</dimen>
+    <dimen name="large_image_margin">10dp</dimen>
 </resources>

@@ -17,7 +17,6 @@ import com.example.twins.listofpictures.model.ListImageModel;
 import com.example.twins.listofpictures.service.TimeService;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -26,7 +25,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
     public static final String BROADCAST_ACTION = "com.example.twins.listofpictures.receiver.TimeBroadcastReceiver;";
-    private List<ImageModel> imageModelList = new ArrayList<ImageModel>();
+    private ArrayList<ImageModel> imageModelList;
     private final CompositeSubscription mSubscriptions = new CompositeSubscription();
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
@@ -38,7 +37,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        loadDate();
+        if (savedInstanceState == null || !savedInstanceState.containsKey("key")) {
+            loadDate();
+            imageModelList = new ArrayList<>();
+        } else
+            imageModelList = savedInstanceState.getParcelableArrayList("key");
+
 
         // Setup RecyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler);
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadDate() {
-//      access internet
+//      need to be access internet
 
         Subscription subscription = ApiManager.getListImage()
                 .subscribeOn(Schedulers.io())
@@ -100,5 +104,11 @@ public class MainActivity extends AppCompatActivity {
         stopService(new Intent(MainActivity.this, TimeService.class));
         mSubscriptions.clear();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("key", imageModelList);
+        super.onSaveInstanceState(outState);
     }
 }
