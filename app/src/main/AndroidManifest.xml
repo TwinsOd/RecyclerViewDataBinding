@@ -30,8 +30,7 @@
 
         <receiver
             android:name=".receiver.TimeBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true" />
+            android:enabled="true"/>
     </application>
 
 </manifest>

@@ -1,7 +1,6 @@
 package com.example.twins.listofpictures;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,10 +10,10 @@ import android.util.Log;
 
 import com.example.twins.listofpictures.adapters.RecyclerViewAdapter;
 import com.example.twins.listofpictures.data.ApiManager;
+import com.example.twins.listofpictures.helpers.BroadcastReceiverHelper;
 import com.example.twins.listofpictures.helpers.ImageTouchHelper;
 import com.example.twins.listofpictures.model.ImageModel;
 import com.example.twins.listofpictures.model.ListImageModel;
-import com.example.twins.listofpictures.receiver.TimeBroadcastReceiver;
 import com.example.twins.listofpictures.service.TimeService;
 
 import java.util.ArrayList;
@@ -27,11 +26,12 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
     public static final String BROADCAST_ACTION = "com.example.twins.listofpictures.receiver.TimeBroadcastReceiver;";
-
     private List<ImageModel> imageModelList = new ArrayList<ImageModel>();
     private final CompositeSubscription mSubscriptions = new CompositeSubscription();
     private RecyclerView mRecyclerView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
+    private BroadcastReceiverHelper mBroadcastReceiverHelper;
+    private boolean mIsReceiverRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +54,25 @@ public class MainActivity extends AppCompatActivity {
         ItemTouchHelper.Callback callback = new ImageTouchHelper(mRecyclerViewAdapter);
         ItemTouchHelper helper = new ItemTouchHelper(callback);
         helper.attachToRecyclerView(mRecyclerView);
+    }
 
-        // create filter for BroadcastReceiver
-        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
+    @Override
+    protected void onResume() {
+        if (!mIsReceiverRegistered) {
+            mBroadcastReceiverHelper = new BroadcastReceiverHelper();
+            mBroadcastReceiverHelper.start(this);
+            mIsReceiverRegistered = true;
+        }
+        super.onResume();
+    }
 
-        TimeBroadcastReceiver timeBroadcastReceiver = new TimeBroadcastReceiver(getFragmentManager());
-        registerReceiver(timeBroadcastReceiver, intentFilter);
-        startService(new Intent(this, TimeService.class));
+    @Override
+    protected void onPause() {
+        if (mIsReceiverRegistered) {
+            mBroadcastReceiverHelper.stop();
+            mIsReceiverRegistered = false;
+        }
+        super.onPause();
     }
 
     private void loadDate() {
@@ -85,8 +97,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
+        stopService(new Intent(MainActivity.this, TimeService.class));
         mSubscriptions.clear();
-        stopService(new Intent(this, TimeService.class));
         super.onDestroy();
     }
 }

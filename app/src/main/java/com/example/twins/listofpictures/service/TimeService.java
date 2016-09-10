@@ -6,35 +6,44 @@ import android.os.IBinder;
 
 import com.example.twins.listofpictures.MainActivity;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TimeService extends Service {
     public final static String PARAM_STATUS = "status";
     public final static String PARAM_TIME = "task";
     public final static int STATUS_START = 100;
+    private Timer timer;
+    private TimerTask tTask;
+    private long interval = 10000;
 
     public TimeService() {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        someTask();
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
     public void onCreate() {
         super.onCreate();
+        timer = new Timer();
+        schedule();
+    }
+    void schedule() {
+        if (tTask != null) tTask.cancel();
+        if (interval > 0) {
+            tTask = new TimerTask() {
+                public void run() {
+                    runTask();
+                }
+            };
+            timer.schedule(tTask, interval, interval);
+        }
     }
 
     @Override
     public void onDestroy() {
+        tTask.cancel();
+        tTask = null;
         super.onDestroy();
     }
 
@@ -44,32 +53,14 @@ public class TimeService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    void someTask() {
-        new Thread(new Runnable() {
-            public void run() {
-                for (int i = 1; i <= 10; i++) {
-                    try {
-                        TimeUnit.MINUTES.sleep(2);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+    void runTask(){
+        Intent intent = new Intent(MainActivity.BROADCAST_ACTION);
 
-                    Intent intent = new Intent(MainActivity.BROADCAST_ACTION);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
 
-                    Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Amsterdam"));
-                    Date currentLocalTime = cal.getTime();
-                    DateFormat date = new SimpleDateFormat("HH:mm", new Locale("nl", "nl"));
-                    date.setTimeZone(TimeZone.getTimeZone("Europe/Amsterdam"));
-                    String currenttime = date.format(currentLocalTime);
-
-                    // send message
-                    intent.putExtra(PARAM_TIME, currenttime);
-                    intent.putExtra(PARAM_STATUS, STATUS_START);
-                    sendBroadcast(intent);
-                }
-                stopSelf();
-            }
-        }
-        ).start();
+        // send message
+        intent.putExtra(PARAM_TIME,  simpleDateFormat.format(new Date()));
+        intent.putExtra(PARAM_STATUS, STATUS_START);
+        sendBroadcast(intent);
     }
 }
