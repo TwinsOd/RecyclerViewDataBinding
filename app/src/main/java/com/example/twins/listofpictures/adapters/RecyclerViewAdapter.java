@@ -26,9 +26,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private Context mContext;
     private List<ImageModel> mList;
 
-    public RecyclerViewAdapter(Context context, List<ImageModel> movies) {
+    public RecyclerViewAdapter(Context context, List<ImageModel> mList) {
         this.mContext = context;
-        this.mList = movies;
+        this.mList = mList;
     }
 
     @Override
@@ -42,9 +42,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         ImageModel imageModel = mList.get(position);
         holder.binding.setImageModel(imageModel);
         holder.binding.setClick(new ImageClickHandler() {
+
             @Override
             public void onColorClick(View view) {
-                view.setBackgroundColor(mContext.getResources().getColor(R.color.colorPrimary));
+                if (imageModel.getColor()) {
+                    imageModel.setColor(false);
+                } else {
+                    imageModel.setColor(true);
+                }
+                notifyItemChanged(position);
             }
 
             @Override
@@ -69,6 +75,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void remove(int position) {
         mList.remove(position);
         notifyItemRemoved(position);
+        notifyItemRangeChanged(position, mList.size());
     }
 
     public void swap(int firstPosition, int secondPosition) {
@@ -76,7 +83,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyItemMoved(firstPosition, secondPosition);
     }
 
-    public void swapAll(List<ImageModel> list){
+    public void swapAll(List<ImageModel> list) {
         mList.clear();
         mList.addAll(list);
         notifyDataSetChanged();

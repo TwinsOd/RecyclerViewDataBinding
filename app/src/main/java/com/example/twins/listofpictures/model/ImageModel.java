@@ -8,11 +8,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ImageModel {
+
     @JsonProperty("url")
     private String url;
 
     @JsonProperty("text")
     private String text;
+
+    private Boolean color = false;
 
     ImageModel(){}
 
@@ -20,6 +23,7 @@ public class ImageModel {
         this.url = url;
         this.text = text;
     }
+
 
     public String getUrl() {
         return url;
@@ -35,5 +39,14 @@ public class ImageModel {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+
+    public Boolean getColor() {
+        return color;
+    }
+
+    public void setColor(Boolean color) {
+        this.color = color;
     }
 }
