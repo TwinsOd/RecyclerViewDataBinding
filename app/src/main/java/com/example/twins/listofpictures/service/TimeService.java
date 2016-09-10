@@ -17,7 +17,7 @@ public class TimeService extends Service {
     public final static int STATUS_START = 100;
     private Timer timer;
     private TimerTask tTask;
-    private long interval = 10000;
+    private long interval = 2*60*10000;
 
     public TimeService() {
     }
